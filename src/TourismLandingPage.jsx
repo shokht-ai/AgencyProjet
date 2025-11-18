@@ -99,13 +99,13 @@ export default function TourismLandingPage() {
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-8">
               <Link to="/" className="text-gray-700 hover:text-blue-600 transition">Bosh sahifa</Link>
-              <Link to="/" className="text-gray-700 hover:text-blue-600 transition">Paketlar</Link>
+              <Link to="/packages " className="text-gray-700 hover:text-blue-600 transition">Paketlar</Link>
               <Link to="/" className="text-gray-700 hover:text-blue-600 transition">Agentliklar</Link>
               <Link to="/" className="text-gray-700 hover:text-blue-600 transition">Biz haqimizda</Link>
-              <button className="text-gray-700 hover:text-blue-600 transition">Kirish</button>
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition">
+              <Link to='/' className="text-gray-700 hover:text-blue-600 transition">Kirish</Link>
+              <Link to='/' className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition">
                 Ro'yxatdan o'tish
-              </button>
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -122,14 +122,14 @@ export default function TourismLandingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-t">
             <div className="px-4 py-4 space-y-3">
-              <a href="#" className="block text-gray-700">Bosh sahifa</a>
-              <a href="#" className="block text-gray-700">Paketlar</a>
-              <a href="#" className="block text-gray-700">Agentliklar</a>
-              <a href="#" className="block text-gray-700">Biz haqimizda</a>
-              <button className="block w-full text-left text-gray-700">Kirish</button>
-              <button className="block w-full bg-blue-600 text-white px-4 py-2 rounded-lg">
+              <Link to='/' className="block text-gray-700">Bosh sahifa</Link>
+              <Link to='/' className="block text-gray-700">Paketlar</Link>
+              <Link to='/' className="block text-gray-700">Agentliklar</Link>
+              <Link to='/' className="block text-gray-700">Biz haqimizda</Link>
+              <Link to='/' className="block w-full text-left text-gray-700">Kirish</Link>
+              <Link to='/' className="block w-full bg-blue-600 text-white px-4 py-2 rounded-lg">
                 Ro'yxatdan o'tish
-              </button>
+              </Link>
             </div>
           </div>
         )}
@@ -334,17 +334,17 @@ export default function TourismLandingPage() {
             <div>
               <h3 className="font-semibold mb-4">Xizmatlar</h3>
               <ul className="space-y-2 text-gray-400 text-sm">
-                <li><a href="#" className="hover:text-white transition">Sayohat paketlari</a></li>
-                <li><a href="#" className="hover:text-white transition">Agentliklar</a></li>
-                <li><a href="#" className="hover:text-white transition">Qidiruv</a></li>
+                <li><Link to='/' className="hover:text-white transition">Sayohat paketlari</Link></li>
+                <li><Link to='/' className="hover:text-white transition">Agentliklar</Link></li>
+                <li><Link to='/' className="hover:text-white transition">Qidiruv</Link></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Kompaniya</h3>
               <ul className="space-y-2 text-gray-400 text-sm">
-                <li><a href="#" className="hover:text-white transition">Biz haqimizda</a></li>
-                <li><a href="#" className="hover:text-white transition">Aloqa</a></li>
-                <li><a href="#" className="hover:text-white transition">Yordam</a></li>
+                <li><Link to='/' className="hover:text-white transition">Biz haqimizda</Link></li>
+                <li><Link to='/' className="hover:text-white transition">Aloqa</Link></li>
+                <li><Link to='/' className="hover:text-white transition">Yordam</Link></li>
               </ul>
             </div>
             <div>

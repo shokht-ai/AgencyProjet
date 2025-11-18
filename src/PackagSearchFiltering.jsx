@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, MapPin, Calendar, Users, Star, Filter, SlidersHorizontal, Grid, List, ChevronDown, X, ArrowUpDown, Heart, Share2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function SearchFilterPage() {
   const [viewMode, setViewMode] = useState('grid');
@@ -194,7 +195,7 @@ export default function SearchFilterPage() {
               <MapPin className="w-6 h-6 text-blue-600" />
               <span className="text-xl font-bold text-gray-900">TravelHub</span>
             </div>
-            <button className="text-blue-600 hover:text-blue-700">Orqaga</button>
+            <Link to='/home' className="text-blue-600 hover:text-blue-700">Orqaga</Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -491,9 +492,9 @@ export default function SearchFilterPage() {
                           >
                             {selectedPackages.includes(pkg.id) ? 'Tanlandi' : 'Solishtirish'}
                           </button>
-                          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm">
-                            Korish
-                          </button>
+                          <Link to={`/package/${pkg.id}`} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm">
+                            Ko'rish
+                          </Link>
                         </div>
                       </div>
                     </div>

@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { MapPin, Mail, Lock, User, Phone, Eye, EyeOff, Facebook, Chrome } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
+  const navigate = useNavigate();
+
   const [loginData, setLoginData] = useState({
     email: '',
     password: '',
@@ -24,6 +27,7 @@ export default function AuthPage() {
   const handleLogin = (e) => {
     e.preventDefault();
     console.log('Login:', loginData);
+    navigate('/home');
     alert('Tizimga kirildi!');
   };
 
