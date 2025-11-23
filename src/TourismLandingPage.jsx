@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Search,
   MapPin,
@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import tourPackages from "./packagesdata.js";
-import api from "./api.js";
+
 
 export default function TourismLandingPage() {
   const navigate = useNavigate();
@@ -58,8 +58,6 @@ export default function TourismLandingPage() {
       .catch((err) => setTourPackages([]));
   }, []);
 
-  console.log("Tour Package Data:");
-  console.log(tourPackageData);
 
   // Tasodifiy 3 ta paket olish
   const popularPackages = shuffleArray(

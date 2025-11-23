@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   MapPin,
@@ -11,7 +11,7 @@ import {
   Heart,
   Share2,
 } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import tourPackageData from "./packagesdata.json";
 
 export default function SearchFilterPage() {

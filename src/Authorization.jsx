@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   MapPin,
   Mail,
@@ -56,6 +56,9 @@ export default function AuthPage() {
   // ------------------- LOGIN -------------------
   const handleLogin = async (e) => {
     e.preventDefault();
+    const BASE_URL = process.env.REACT_APP_API_URL;
+    console.log("rekshirish kerak: ",BASE_URL);
+
 
     const res = await api({
       endpoint: "api/login/",

@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const BASE_URL = "https://neoshokh2.pythonanywhere.com";
+const BASE_URL = process.env.REACT_APP_API_URL;
 
-// const BASE_URL = "http://127.0.0.1:8000";
+
 const api = async ({
   endpoint = "",
   method = "GET",
