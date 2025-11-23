@@ -118,7 +118,7 @@ export default function CheckoutPage() {
     }
 
     // 3. Phone format validation (faqat raqamlar, +, -, bo‘sh joylar)
-    const phoneRegex = /^[+]?[\d\s\-]{7,15}$/;
+    const phoneRegex = /^[+]?[\d\s-]{7,15}$/;
     if (!phone || !phoneRegex.test(phone)) {
       return false;
     }

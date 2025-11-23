@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { User, Mail, Phone, MapPin, Calendar, Heart, ShoppingBag, Settings, Bell, Shield, CreditCard, LogOut, Edit2, Save, X, Star, Clock, CheckCircle, XCircle, Lock } from 'lucide-react';
+import { useState } from 'react';
+import { User, Mail, Phone, MapPin, Calendar, Heart, ShoppingBag, Settings, Bell, Shield, CreditCard, LogOut, Edit2, Save, X, Star, Clock, CheckCircle, Lock } from 'lucide-react';
 
 export default function UserProfilePage() {
   const [activeTab, setActiveTab] = useState('profile');

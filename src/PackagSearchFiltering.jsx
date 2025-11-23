@@ -167,6 +167,7 @@ export default function SearchFilterPage() {
   useEffect(() => {
     filterPackages();
     localStorage.setItem("likedPackages", JSON.stringify(likedPackages));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, likedPackages]);
 
   const [searchParams, setSearchParams] = useState(getInitialSearchParams());
@@ -299,7 +300,7 @@ export default function SearchFilterPage() {
     }));
   };
 
-  const toggleCompare = (packageId) => {
+/*   const toggleCompare = (packageId) => {
     setSelectedPackages((prev) =>
       prev.includes(packageId)
         ? prev.filter((id) => id !== packageId)
@@ -307,7 +308,7 @@ export default function SearchFilterPage() {
         ? [...prev, packageId]
         : prev
     );
-  };
+  }; */
 
   const clearFilters = () => {
     setFilters({
