@@ -21,7 +21,7 @@ export default function OrdersManagement() {
       package: {
         title: 'Dubai Premium Safari',
         location: 'Dubai, BAA',
-        duration: '5 kun / 4 tun'
+        travelingDate: '5 kun / 4 tun'
       },
       bookingDate: '2024-10-05',
       travelDate: '2024-12-15',
@@ -42,7 +42,7 @@ export default function OrdersManagement() {
       package: {
         title: 'Istanbul Tarixiy Sayohati',
         location: 'Istanbul, Turkiya',
-        duration: '4 kun / 3 tun'
+        travelingDate: '4 kun / 3 tun'
       },
       bookingDate: '2024-10-04',
       travelDate: '2024-11-20',
@@ -63,7 +63,7 @@ export default function OrdersManagement() {
       package: {
         title: 'Bali Tropik Ta\'tili',
         location: 'Bali, Indoneziya',
-        duration: '7 kun / 6 tun'
+        travelingDate: '7 kun / 6 tun'
       },
       bookingDate: '2024-10-03',
       travelDate: '2024-11-10',
@@ -84,7 +84,7 @@ export default function OrdersManagement() {
       package: {
         title: 'Parij Romantik Tour',
         location: 'Parij, Fransiya',
-        duration: '6 kun / 5 tun'
+        travelingDate: '6 kun / 5 tun'
       },
       bookingDate: '2024-10-02',
       travelDate: '2024-12-01',
@@ -105,7 +105,7 @@ export default function OrdersManagement() {
       package: {
         title: 'Maldiv Orollari Lux',
         location: 'Maldivlar',
-        duration: '5 kun / 4 tun'
+        travelingDate: '5 kun / 4 tun'
       },
       bookingDate: '2024-10-01',
       travelDate: '2024-12-20',
@@ -126,7 +126,7 @@ export default function OrdersManagement() {
       package: {
         title: 'Dubai Premium Safari',
         location: 'Dubai, BAA',
-        duration: '5 kun / 4 tun'
+        travelingDate: '5 kun / 4 tun'
       },
       bookingDate: '2024-09-30',
       travelDate: '2024-11-15',
@@ -217,7 +217,7 @@ export default function OrdersManagement() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-gray-900 text-white transition-all duration-300 flex flex-col`}>
+      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-gray-900 text-white transition-all travelingDate-300 flex flex-col`}>
         <div className="p-6 flex items-center justify-between">
           {sidebarOpen && <span className="text-xl font-bold">Grand Tours</span>}
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-gray-800 rounded-lg">
@@ -521,7 +521,7 @@ export default function OrdersManagement() {
                     </div>
                     <div className="flex items-center text-gray-700">
                       <Clock className="w-4 h-4 mr-2" />
-                      {selectedOrder.package.duration}
+                      {selectedOrder.package.travelingDate}
                     </div>
                     <div className="flex items-center text-gray-700">
                       <Users className="w-4 h-4 mr-2" />

@@ -1,174 +1,308 @@
-import React, { useState } from 'react';
-import { Search, MapPin, Calendar, Users, Star, Filter, SlidersHorizontal, Grid, List, ChevronDown, X, ArrowUpDown, Heart, Share2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import {
+  Search,
+  MapPin,
+  Calendar,
+  Users,
+  Star,
+  SlidersHorizontal,
+  Grid,
+  List,
+  Heart,
+  Share2,
+} from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import tourPackageData from "./packagesdata.json";
 
 export default function SearchFilterPage() {
-  const [viewMode, setViewMode] = useState('grid');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [viewMode, setViewMode] = useState("grid");
   const [showFilters, setShowFilters] = useState(true);
-  const [sortBy, setSortBy] = useState('popular');
+  const [sortBy, setSortBy] = useState("popular");
   const [selectedPackages, setSelectedPackages] = useState([]);
+  const [likedPackages, setLikedPackages] = useState(() => {
+    return JSON.parse(localStorage.getItem("likedPackages")) || [];
+  });
 
   const [filters, setFilters] = useState({
     priceRange: [0, 5000000],
-    duration: '',
+    travelingDate: "",
     rating: 0,
     categories: [],
     agencies: [],
-    facilities: []
+    facilities: [],
   });
 
-  const [searchParams, setSearchParams] = useState({
-    destination: 'Dubai',
-    date: '',
-    guests: '2'
-  });
+  const sortPackages = (packages) => {
+    let sorted = [...packages];
 
-  const categories = ['Plyaj', 'Tarix', 'Ekskursiya', 'Avantüra', 'Luxe', 'Oilaviy'];
-  const durations = ['1-3 kun', '4-6 kun', '7-10 kun', '10+ kun'];
-  const facilities = ['Mehmonxona', 'Transfer', 'Ovqat', 'Gid', 'Sug\'urta', 'Viza'];
-  const agencies = ['Grand Tours', 'Silk Road Travel', 'Europe Express', 'Asia Dreams', 'Ocean Travels'];
+    switch (sortBy) {
+      case "price-low":
+        sorted.sort((a, b) => a.price - b.price);
+        break;
 
-  const tourPackages = [
-    {
-      id: 1,
-      title: "Dubai Premium Safari",
-      agency: "Grand Tours",
-      location: "Dubai, BAA",
-      price: 2500000,
-      originalPrice: 3000000,
-      duration: "5 kun / 4 tun",
-      rating: 4.8,
-      reviews: 142,
-      image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80",
-      category: "Luxe",
-      facilities: ["Mehmonxona", "Transfer", "Ovqat", "Gid"],
-      description: "Dubai sharida unutilmas sayohat. Burj Khalifa, safari va ko'plab diqqatga sazovor joylar.",
-      featured: true,
-      discount: 17
-    },
-    {
-      id: 2,
-      title: "Istanbul Tarixiy Sayohati",
-      agency: "Silk Road Travel",
-      location: "Istanbul, Turkiya",
-      price: 1800000,
-      originalPrice: 2200000,
-      duration: "4 kun / 3 tun",
-      rating: 4.9,
-      reviews: 218,
-      image: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=800&q=80",
-      category: "Tarix",
-      facilities: ["Mehmonxona", "Transfer", "Gid"],
-      description: "Istanbul tarixiy joylarini kashf eting. Ayasofya, Topkapi va ko'plab muzeylarga tashrif.",
-      discount: 18
-    },
-    {
-      id: 3,
-      title: "Parij Romantik Tour",
-      agency: "Europe Express",
-      location: "Parij, Fransiya",
-      price: 3200000,
-      originalPrice: 3800000,
-      duration: "6 kun / 5 tun",
-      rating: 4.7,
-      reviews: 95,
-      image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80",
-      category: "Ekskursiya",
-      facilities: ["Mehmonxona", "Transfer", "Ovqat", "Gid", "Viza"],
-      description: "Parij - sevgi shahri. Eyfel minorasi, Luvr va Seine bo'ylab sayohat.",
-      discount: 16
-    },
-    {
-      id: 4,
-      title: "Bali Tropik Ta'tili",
-      agency: "Asia Dreams",
-      location: "Bali, Indoneziya",
-      price: 2100000,
-      originalPrice: 2500000,
-      duration: "7 kun / 6 tun",
-      rating: 4.9,
-      reviews: 167,
-      image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
-      category: "Plyaj",
-      facilities: ["Mehmonxona", "Transfer", "Ovqat", "Sug'urta"],
-      description: "Bali orolida dam olish. Tropik plyajlar, ma'badlar va spa.",
-      discount: 16
-    },
-    {
-      id: 5,
-      title: "Maldiv Orollari Lux",
-      agency: "Ocean Travels",
-      location: "Maldivlar",
-      price: 4500000,
-      originalPrice: 5500000,
-      duration: "5 kun / 4 tun",
-      rating: 5.0,
-      reviews: 89,
-      image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80",
-      category: "Luxe",
-      facilities: ["Mehmonxona", "Transfer", "Ovqat", "Sug'urta"],
-      description: "Maldivlarda hashamatli dam olish. Suv ustidagi bungalolar va kristal suv.",
-      featured: true,
-      discount: 18
-    },
-    {
-      id: 6,
-      title: "Rim Antik Sayohati",
-      agency: "Europe Express",
-      location: "Rim, Italiya",
-      price: 2800000,
-      originalPrice: 3200000,
-      duration: "5 kun / 4 tun",
-      rating: 4.8,
-      reviews: 134,
-      image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800&q=80",
-      category: "Tarix",
-      facilities: ["Mehmonxona", "Transfer", "Gid", "Viza"],
-      description: "Qadimgi Rim tarixi. Kolizey, Vatikan va Fontana di Trevi.",
-      discount: 13
+      case "price-high":
+        sorted.sort((a, b) => b.price - a.price);
+        break;
+
+      case "rating":
+        sorted.sort((a, b) => b.rating - a.rating);
+        break;
+
+      case "travelingDate":
+        sorted.sort((a, b) => {
+          const daysA = parseInt(a.travelingDate);
+          const daysB = parseInt(b.travelingDate);
+          return daysA - daysB;
+        });
+        break;
+
+      case "popular":
+      default:
+        sorted.sort((a, b) => b.reviews - a.reviews);
+        break;
     }
+
+    return sorted;
+  };
+
+  // Query params dan boshlang'ich qiymat olish
+  const getInitialSearchParams = () => {
+    const params = new URLSearchParams(location.search);
+    const destination = params.get("destination");
+    const date = params.get("date");
+    const guests = params.get("guests");
+
+    // Agar params bo'lmasa, default qiymat qaytarsin
+    return {
+      destination: destination || "",
+      date: date || "",
+      guests: guests || "",
+    };
+  };
+
+  // Filtrlash funksiyasi
+  const filterPackages = () => {
+    const result = tourPackages.filter((pkg) => {
+      // Price filter
+      const withinPrice =
+        pkg.price >= filters.priceRange[0] &&
+        pkg.price <= filters.priceRange[1];
+
+      // travelingDate filter (agar travelingDate tanlangan bo'lsa)
+      const matchesTravelingDate = filters.travelingDate
+        ? (() => {
+            if (filters.travelingDate.includes("+")) {
+              const minDays = parseInt(filters.travelingDate);
+              const pkgDays = parseInt(pkg.travelingDate);
+              return pkgDays >= minDays;
+            } else {
+              const [minDays, maxDays] = filters.travelingDate
+                .split("-")
+                .map((d) => parseInt(d));
+              const pkgDays = parseInt(pkg.travelingDate);
+              return pkgDays >= minDays && pkgDays <= maxDays;
+            }
+          })()
+        : true;
+
+      // Rating filter
+      const meetsRating = pkg.rating >= filters.rating;
+
+      // Category filter
+      const matchesCategory = filters.categories.length
+        ? filters.categories.includes(pkg.category)
+        : true;
+
+      // Agency filter
+      const matchesAgency = filters.agencies.length
+        ? filters.agencies.includes(pkg.agency)
+        : true;
+
+      // Facilities filter
+      const matchesFacilities = filters.facilities.length
+        ? filters.facilities.every((fac) => pkg.facilities.includes(fac))
+        : true;
+
+      // SearchParams filter
+      const matchesDestination = searchParams.destination
+        ? pkg.location
+            .toLowerCase()
+            .includes(searchParams.destination.toLowerCase())
+        : true;
+
+      const matchesDate = searchParams.date
+        ? (() => {
+            const searchDate = new Date(searchParams.date);
+            const pkgDate = new Date(pkg.travelingDate);
+
+            // ±1 oy oralig'ini tekshirish
+            const oneMonthBefore = new Date(searchDate);
+            oneMonthBefore.setMonth(oneMonthBefore.getMonth() - 1);
+
+            const oneMonthAfter = new Date(searchDate);
+            oneMonthAfter.setMonth(oneMonthAfter.getMonth() + 1);
+
+            return pkgDate >= oneMonthBefore && pkgDate <= oneMonthAfter;
+          })()
+        : true;
+
+      // Hammasi to'g'ri bo'lsa paketni olamiz
+      return (
+        withinPrice &&
+        matchesTravelingDate &&
+        meetsRating &&
+        matchesCategory &&
+        matchesAgency &&
+        matchesFacilities &&
+        matchesDestination &&
+        matchesDate
+      );
+    });
+
+    setFilteredPackages(sortPackages(result));
+  };
+
+  useEffect(() => {
+    filterPackages();
+    localStorage.setItem("likedPackages", JSON.stringify(likedPackages));
+  }, [filters, likedPackages]);
+
+  const [searchParams, setSearchParams] = useState(getInitialSearchParams());
+
+  // Qo'lda yaratish uchun eski formatga moslashtirish
+  const tourPackages = tourPackageData.map((pkg) => ({
+    id: pkg.id,
+    title: pkg.title,
+    agency: pkg.agency,
+    location: pkg.location,
+    price: pkg.price,
+    originalPrice: pkg.originalPrice,
+    travelingDate: pkg.travelingDate,
+    rating: pkg.rating,
+    reviews: pkg.reviews,
+    image: pkg.images && pkg.images.length > 0 ? pkg.images[0] : "",
+    category: pkg.category,
+    facilities: pkg.facilities.map((f) => f.name), // faqat nomlar
+    description: pkg.description,
+    featured: pkg.featured,
+    discount: pkg.discount,
+  }));
+
+  const categories = [
+    "Plyaj",
+    "Tarix",
+    "Ekskursiya",
+    "Avantüra",
+    "Luxe",
+    "Oilaviy",
+  ];
+  const facilities = [
+    "Mehmonxona",
+    "Transfer",
+    "Ovqat",
+    "Gid",
+    "Sug'urta",
+    "Viza",
+  ];
+  const agencies = [
+    "Grand Tours",
+    "Silk Road Travel",
+    "Europe Express",
+    "Asia Dreams",
+    "Ocean Travels",
   ];
 
   const [filteredPackages, setFilteredPackages] = useState(tourPackages);
 
+  const handleSearch = () => {
+    const query = new URLSearchParams(searchParams).toString();
+    navigate(`/packages?${query}`);
+
+    // Qidirish tugmasi bosilganda ro'yxatni yangilash
+    filterPackages();
+  };
+
+  const handleBack = () => {
+    const history = JSON.parse(localStorage.getItem("history") || "[]");
+
+    if (history.length >= 2) {
+      // Hozirgi sahifani olib tashlaymiz
+      history.pop();
+
+      // Oldingi sahifa
+      const previousPage = history.pop();
+
+      localStorage.setItem("history", JSON.stringify(history));
+
+      navigate(previousPage);
+    } else {
+      navigate("/"); // fallback
+    }
+  };
+
+  const handleHomeClick = () => {
+    navigate("/home");
+  };
+
+  const handleOpenDetails = (pkg) => {
+    navigate(
+      `/package/${pkg.id}?date=${pkg.travelingDate}&guests=${searchParams.guests}`
+    );
+  };
+
   const handleFilterChange = (filterType, value) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [filterType]: value
+      [filterType]: value,
     }));
   };
 
+  const toggleLike = (id) => {
+    let updated;
+
+    if (likedPackages.includes(id)) {
+      updated = likedPackages.filter((x) => x !== id);
+    } else {
+      updated = [...likedPackages, id];
+    }
+
+    setLikedPackages(updated);
+    localStorage.setItem("likedPackages", JSON.stringify(updated));
+  };
+
   const toggleCategory = (category) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       categories: prev.categories.includes(category)
-        ? prev.categories.filter(c => c !== category)
-        : [...prev.categories, category]
+        ? prev.categories.filter((c) => c !== category)
+        : [...prev.categories, category],
     }));
   };
 
   const toggleAgency = (agency) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       agencies: prev.agencies.includes(agency)
-        ? prev.agencies.filter(a => a !== agency)
-        : [...prev.agencies, agency]
+        ? prev.agencies.filter((a) => a !== agency)
+        : [...prev.agencies, agency],
     }));
   };
 
   const toggleFacility = (facility) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       facilities: prev.facilities.includes(facility)
-        ? prev.facilities.filter(f => f !== facility)
-        : [...prev.facilities, facility]
+        ? prev.facilities.filter((f) => f !== facility)
+        : [...prev.facilities, facility],
     }));
   };
 
   const toggleCompare = (packageId) => {
-    setSelectedPackages(prev =>
+    setSelectedPackages((prev) =>
       prev.includes(packageId)
-        ? prev.filter(id => id !== packageId)
+        ? prev.filter((id) => id !== packageId)
         : prev.length < 3
         ? [...prev, packageId]
         : prev
@@ -178,11 +312,11 @@ export default function SearchFilterPage() {
   const clearFilters = () => {
     setFilters({
       priceRange: [0, 5000000],
-      duration: '',
+      travelingDate: "",
       rating: 0,
       categories: [],
       agencies: [],
-      facilities: []
+      facilities: [],
     });
   };
 
@@ -191,11 +325,20 @@ export default function SearchFilterPage() {
       <div className="bg-white shadow-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-2">
+            <button
+              onClick={handleHomeClick}
+              className="flex items-center space-x-2"
+            >
               <MapPin className="w-6 h-6 text-blue-600" />
               <span className="text-xl font-bold text-gray-900">TravelHub</span>
-            </div>
-            <Link to='/home' className="text-blue-600 hover:text-blue-700">Orqaga</Link>
+            </button>
+            <button
+              onClick={handleBack}
+              to="/home"
+              className="text-blue-600 hover:text-blue-700"
+            >
+              Orqaga
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -204,7 +347,12 @@ export default function SearchFilterPage() {
               <input
                 type="text"
                 value={searchParams.destination}
-                onChange={(e) => setSearchParams({...searchParams, destination: e.target.value})}
+                onChange={(e) =>
+                  setSearchParams({
+                    ...searchParams,
+                    destination: e.target.value,
+                  })
+                }
                 placeholder="Manzil"
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
@@ -214,7 +362,9 @@ export default function SearchFilterPage() {
               <input
                 type="date"
                 value={searchParams.date}
-                onChange={(e) => setSearchParams({...searchParams, date: e.target.value})}
+                onChange={(e) =>
+                  setSearchParams({ ...searchParams, date: e.target.value })
+                }
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -222,7 +372,9 @@ export default function SearchFilterPage() {
               <Users className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
               <select
                 value={searchParams.guests}
-                onChange={(e) => setSearchParams({...searchParams, guests: e.target.value})}
+                onChange={(e) =>
+                  setSearchParams({ ...searchParams, guests: e.target.value })
+                }
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="1">1 kishi</option>
@@ -231,7 +383,10 @@ export default function SearchFilterPage() {
                 <option value="6+">6+ kishi</option>
               </select>
             </div>
-            <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center space-x-2">
+            <button
+              onClick={handleSearch}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center space-x-2"
+            >
               <Search className="w-5 h-5" />
               <span>Qidirish</span>
             </button>
@@ -245,7 +400,9 @@ export default function SearchFilterPage() {
             <h1 className="text-2xl font-bold text-gray-900 mb-1">
               {searchParams.destination} uchun sayohat paketlari
             </h1>
-            <p className="text-gray-600">{filteredPackages.length} ta natija topildi</p>
+            <p className="text-gray-600">
+              {filteredPackages.length} ta natija topildi
+            </p>
           </div>
 
           <div className="flex items-center space-x-3">
@@ -266,19 +423,27 @@ export default function SearchFilterPage() {
               <option value="price-low">Arzon narx</option>
               <option value="price-high">Qimmat narx</option>
               <option value="rating">Reyting</option>
-              <option value="duration">Davomiyligi</option>
+              <option value="travelingDate">Davomiyligi</option>
             </select>
 
             <div className="flex border border-gray-300 rounded-lg overflow-hidden">
               <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
+                onClick={() => setViewMode("grid")}
+                className={`p-2 ${
+                  viewMode === "grid"
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-gray-600"
+                }`}
               >
                 <Grid className="w-5 h-5" />
               </button>
               <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
+                onClick={() => setViewMode("list")}
+                className={`p-2 ${
+                  viewMode === "list"
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-gray-600"
+                }`}
               >
                 <List className="w-5 h-5" />
               </button>
@@ -302,7 +467,9 @@ export default function SearchFilterPage() {
 
                 <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-3">Narx oralig'i</h3>
+                    <h3 className="font-semibold text-gray-900 mb-3">
+                      Narx oralig'i
+                    </h3>
                     <div className="space-y-2">
                       <input
                         type="range"
@@ -310,51 +477,77 @@ export default function SearchFilterPage() {
                         max="5000000"
                         step="100000"
                         value={filters.priceRange[1]}
-                        onChange={(e) => handleFilterChange('priceRange', [0, parseInt(e.target.value)])}
+                        onChange={(e) =>
+                          handleFilterChange("priceRange", [
+                            0,
+                            parseInt(e.target.value),
+                          ])
+                        }
                         className="w-full"
                       />
                       <div className="flex justify-between text-sm text-gray-600">
                         <span>0 so'm</span>
-                        <span>{filters.priceRange[1].toLocaleString()} so'm</span>
+                        <span>
+                          {filters.priceRange[1].toLocaleString()} so'm
+                        </span>
                       </div>
                     </div>
                   </div>
 
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-3">Davomiyligi</h3>
+                  {/*<div>
+                    <h3 className="font-semibold text-gray-900 mb-3">
+                      Davomiyligi
+                    </h3>
                     <div className="space-y-2">
-                      {durations.map(duration => (
-                        <label key={duration} className="flex items-center space-x-2 cursor-pointer">
+                      {travelingDates.map((travelingDate) => (
+                        <label
+                          key={travelingDate}
+                          className="flex items-center space-x-2 cursor-pointer"
+                        >
                           <input
                             type="radio"
-                            name="duration"
-                            checked={filters.duration === duration}
-                            onChange={() => handleFilterChange('duration', duration)}
+                            name="travelingDate"
+                            checked={filters.travelingDate === travelingDate}
+                            onChange={() =>
+                              handleFilterChange("travelingDate", travelingDate)
+                            }
                             className="w-4 h-4 text-blue-600"
                           />
-                          <span className="text-gray-700">{duration}</span>
+                          <span className="text-gray-700">{travelingDate}</span>
                         </label>
                       ))}
                     </div>
-                  </div>
+                  </div>*/}
 
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-3">Reyting</h3>
+                    <h3 className="font-semibold text-gray-900 mb-3">
+                      Reyting
+                    </h3>
                     <div className="space-y-2">
-                      {[5, 4, 3, 2].map(rating => (
-                        <label key={rating} className="flex items-center space-x-2 cursor-pointer">
+                      {[5, 4, 3, 2].map((rating) => (
+                        <label
+                          key={rating}
+                          className="flex items-center space-x-2 cursor-pointer"
+                        >
                           <input
                             type="radio"
                             name="rating"
                             checked={filters.rating === rating}
-                            onChange={() => handleFilterChange('rating', rating)}
+                            onChange={() =>
+                              handleFilterChange("rating", rating)
+                            }
                             className="w-4 h-4 text-blue-600"
                           />
                           <div className="flex items-center">
                             {[...Array(rating)].map((_, i) => (
-                              <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                              <Star
+                                key={i}
+                                className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                              />
                             ))}
-                            <span className="ml-2 text-gray-700">va yuqori</span>
+                            <span className="ml-2 text-gray-700">
+                              va yuqori
+                            </span>
                           </div>
                         </label>
                       ))}
@@ -362,10 +555,15 @@ export default function SearchFilterPage() {
                   </div>
 
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-3">Kategoriyalar</h3>
+                    <h3 className="font-semibold text-gray-900 mb-3">
+                      Kategoriyalar
+                    </h3>
                     <div className="space-y-2">
-                      {categories.map(category => (
-                        <label key={category} className="flex items-center space-x-2 cursor-pointer">
+                      {categories.map((category) => (
+                        <label
+                          key={category}
+                          className="flex items-center space-x-2 cursor-pointer"
+                        >
                           <input
                             type="checkbox"
                             checked={filters.categories.includes(category)}
@@ -379,10 +577,15 @@ export default function SearchFilterPage() {
                   </div>
 
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-3">Agentliklar</h3>
+                    <h3 className="font-semibold text-gray-900 mb-3">
+                      Agentliklar
+                    </h3>
                     <div className="space-y-2">
-                      {agencies.map(agency => (
-                        <label key={agency} className="flex items-center space-x-2 cursor-pointer">
+                      {agencies.map((agency) => (
+                        <label
+                          key={agency}
+                          className="flex items-center space-x-2 cursor-pointer"
+                        >
                           <input
                             type="checkbox"
                             checked={filters.agencies.includes(agency)}
@@ -396,10 +599,15 @@ export default function SearchFilterPage() {
                   </div>
 
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-3">Xizmatlar</h3>
+                    <h3 className="font-semibold text-gray-900 mb-3">
+                      Xizmatlar
+                    </h3>
                     <div className="space-y-2">
-                      {facilities.map(facility => (
-                        <label key={facility} className="flex items-center space-x-2 cursor-pointer">
+                      {facilities.map((facility) => (
+                        <label
+                          key={facility}
+                          className="flex items-center space-x-2 cursor-pointer"
+                        >
                           <input
                             type="checkbox"
                             checked={filters.facilities.includes(facility)}
@@ -417,15 +625,18 @@ export default function SearchFilterPage() {
           )}
 
           <div className="flex-1">
-            {viewMode === 'grid' ? (
+            {viewMode === "grid" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredPackages.map(pkg => (
-                  <div key={pkg.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition group">
+                {filteredPackages.map((pkg) => (
+                  <div
+                    key={pkg.id}
+                    className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition group"
+                  >
                     <div className="relative h-48 overflow-hidden">
                       <img
                         src={pkg.image}
                         alt={pkg.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                        className="w-full h-full object-cover group-hover:scale-110 transition travelingDate-500"
                       />
                       {pkg.featured && (
                         <div className="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -438,8 +649,18 @@ export default function SearchFilterPage() {
                         </div>
                       )}
                       <div className="absolute bottom-3 right-3 flex space-x-2">
-                        <button className="bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition">
-                          <Heart className="w-4 h-4 text-gray-700" />
+                        <button
+                          onClick={() => toggleLike(pkg.id)}
+                          className={`bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition`}
+                        >
+                          <Heart
+                            className={`w-4 h-4 
+                            ${
+                              likedPackages.includes(pkg.id)
+                                ? "fill-red-500 stroke-red-500"
+                                : "fill-none stroke-gray-700"
+                            }`}
+                          />
                         </button>
                         <button className="bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition">
                           <Share2 className="w-4 h-4 text-gray-700" />
@@ -447,24 +668,33 @@ export default function SearchFilterPage() {
                       </div>
                     </div>
                     <div className="p-4">
-                      <div className="text-sm text-blue-600 mb-1">{pkg.agency}</div>
-                      <h3 className="font-bold text-lg text-gray-900 mb-2">{pkg.title}</h3>
+                      <div className="text-sm text-blue-600 mb-1">
+                        {pkg.agency}
+                      </div>
+                      <h3 className="font-bold text-lg text-gray-900 mb-2">
+                        {pkg.title}
+                      </h3>
                       <div className="flex items-center text-gray-600 text-sm mb-2">
                         <MapPin className="w-4 h-4 mr-1" />
                         {pkg.location}
                       </div>
                       <div className="flex items-center text-gray-600 text-sm mb-3">
                         <Calendar className="w-4 h-4 mr-1" />
-                        {pkg.duration}
+                        {pkg.travelingDate}
                       </div>
                       <div className="flex items-center mb-3">
                         <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                         <span className="ml-1 font-semibold">{pkg.rating}</span>
-                        <span className="text-gray-500 text-sm ml-1">({pkg.reviews} ta sharh)</span>
+                        <span className="text-gray-500 text-sm ml-1">
+                          ({pkg.reviews} ta sharh)
+                        </span>
                       </div>
                       <div className="flex flex-wrap gap-1 mb-4">
                         {pkg.facilities.slice(0, 3).map((facility, idx) => (
-                          <span key={idx} className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">
+                          <span
+                            key={idx}
+                            className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded"
+                          >
                             {facility}
                           </span>
                         ))}
@@ -479,22 +709,29 @@ export default function SearchFilterPage() {
                           <div className="text-2xl font-bold text-gray-900">
                             {pkg.price.toLocaleString()}
                           </div>
-                          <div className="text-xs text-gray-500">so'm / odam</div>
+                          <div className="text-xs text-gray-500">
+                            so'm / odam
+                          </div>
                         </div>
                         <div className="flex flex-col gap-2">
-                          <button
+                          {/*<button
                             onClick={() => toggleCompare(pkg.id)}
                             className={`px-3 py-1 text-sm rounded transition ${
                               selectedPackages.includes(pkg.id)
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                ? "bg-blue-600 text-white"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             }`}
                           >
-                            {selectedPackages.includes(pkg.id) ? 'Tanlandi' : 'Solishtirish'}
+                            {selectedPackages.includes(pkg.id)
+                              ? "Tanlandi"
+                              : "Solishtirish"}
+                          </button>*/}
+                          <button
+                            onClick={() => handleOpenDetails(pkg)}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm"
+                          >
+                            Batafsil
                           </button>
-                          <Link to={`/package/${pkg.id}`} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm">
-                            Ko'rish
-                          </Link>
                         </div>
                       </div>
                     </div>
@@ -503,8 +740,11 @@ export default function SearchFilterPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {filteredPackages.map(pkg => (
-                  <div key={pkg.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition flex">
+                {filteredPackages.map((pkg) => (
+                  <div
+                    key={pkg.id}
+                    className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition flex"
+                  >
                     <div className="relative w-64 flex-shrink-0">
                       <img
                         src={pkg.image}
@@ -525,8 +765,12 @@ export default function SearchFilterPage() {
                     <div className="flex-1 p-6 flex flex-col">
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex-1">
-                          <div className="text-sm text-blue-600 mb-1">{pkg.agency}</div>
-                          <h3 className="font-bold text-xl text-gray-900 mb-2">{pkg.title}</h3>
+                          <div className="text-sm text-blue-600 mb-1">
+                            {pkg.agency}
+                          </div>
+                          <h3 className="font-bold text-xl text-gray-900 mb-2">
+                            {pkg.title}
+                          </h3>
                           <div className="flex items-center space-x-4 text-gray-600 text-sm mb-2">
                             <div className="flex items-center">
                               <MapPin className="w-4 h-4 mr-1" />
@@ -534,28 +778,44 @@ export default function SearchFilterPage() {
                             </div>
                             <div className="flex items-center">
                               <Calendar className="w-4 h-4 mr-1" />
-                              {pkg.duration}
+                              {pkg.travelingDate}
                             </div>
                           </div>
                           <div className="flex items-center mb-3">
                             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                            <span className="ml-1 font-semibold">{pkg.rating}</span>
-                            <span className="text-gray-500 text-sm ml-1">({pkg.reviews} ta sharh)</span>
+                            <span className="ml-1 font-semibold">
+                              {pkg.rating}
+                            </span>
+                            <span className="text-gray-500 text-sm ml-1">
+                              ({pkg.reviews} ta sharh)
+                            </span>
                           </div>
                         </div>
                         <div className="flex space-x-2">
                           <button className="p-2 hover:bg-gray-100 rounded-full transition">
-                            <Heart className="w-5 h-5 text-gray-700" />
+                            <Heart
+                              className={`w-4 h-4 
+                            ${
+                              likedPackages.includes(pkg.id)
+                                ? "fill-red-500 stroke-red-500"
+                                : "fill-none stroke-gray-700"
+                            }`}
+                            />
                           </button>
                           <button className="p-2 hover:bg-gray-100 rounded-full transition">
                             <Share2 className="w-5 h-5 text-gray-700" />
                           </button>
                         </div>
                       </div>
-                      <p className="text-gray-600 text-sm mb-4">{pkg.description}</p>
+                      <p className="text-gray-600 text-sm mb-4">
+                        {pkg.description}
+                      </p>
                       <div className="flex flex-wrap gap-2 mb-4">
                         {pkg.facilities.map((facility, idx) => (
-                          <span key={idx} className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">
+                          <span
+                            key={idx}
+                            className="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full"
+                          >
                             {facility}
                           </span>
                         ))}
@@ -570,20 +830,27 @@ export default function SearchFilterPage() {
                           <div className="text-3xl font-bold text-gray-900">
                             {pkg.price.toLocaleString()}
                           </div>
-                          <div className="text-xs text-gray-500">som / odam</div>
+                          <div className="text-xs text-gray-500">
+                            som / odam
+                          </div>
                         </div>
                         <div className="flex items-center space-x-3">
-                          <button
+                          {/*<button
                             onClick={() => toggleCompare(pkg.id)}
                             className={`px-4 py-2 rounded-lg transition ${
                               selectedPackages.includes(pkg.id)
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                ? "bg-blue-600 text-white"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             }`}
                           >
-                            {selectedPackages.includes(pkg.id) ? 'Tanlandi' : 'Solishtirish'}
-                          </button>
-                          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                            {selectedPackages.includes(pkg.id)
+                              ? "Tanlandi"
+                              : "Solishtirish"}
+                          </button>*/}
+                          <button
+                            onClick={() => handleOpenDetails(pkg)}
+                            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+                          >
                             Batafsil
                           </button>
                         </div>

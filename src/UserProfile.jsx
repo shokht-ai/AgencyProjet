@@ -437,7 +437,7 @@ export default function UserProfilePage() {
                         <img
                           src={pkg.image}
                           alt={pkg.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                          className="w-full h-full object-cover group-hover:scale-110 transition travelingDate-500"
                         />
                         <button className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition">
                           <Heart className="w-5 h-5 fill-red-500 text-red-500" />

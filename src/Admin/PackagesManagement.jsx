@@ -15,7 +15,7 @@ export default function PackagesManagement() {
       title: 'Dubai Premium Safari',
       location: 'Dubai, BAA',
       price: 2500000,
-      duration: '5 kun / 4 tun',
+      travelingDate: '5 kun / 4 tun',
       category: 'Luxe',
       status: 'active',
       bookings: 47,
@@ -28,7 +28,7 @@ export default function PackagesManagement() {
       title: 'Istanbul Tarixiy Sayohati',
       location: 'Istanbul, Turkiya',
       price: 1800000,
-      duration: '4 kun / 3 tun',
+      travelingDate: '4 kun / 3 tun',
       category: 'Tarix',
       status: 'active',
       bookings: 38,
@@ -41,7 +41,7 @@ export default function PackagesManagement() {
       title: 'Bali Tropik Ta\'tili',
       location: 'Bali, Indoneziya',
       price: 2100000,
-      duration: '7 kun / 6 tun',
+      travelingDate: '7 kun / 6 tun',
       category: 'Plyaj',
       status: 'active',
       bookings: 32,
@@ -54,7 +54,7 @@ export default function PackagesManagement() {
       title: 'Parij Romantik Tour',
       location: 'Parij, Fransiya',
       price: 3200000,
-      duration: '6 kun / 5 tun',
+      travelingDate: '6 kun / 5 tun',
       category: 'Ekskursiya',
       status: 'inactive',
       bookings: 28,
@@ -67,7 +67,7 @@ export default function PackagesManagement() {
       title: 'Maldiv Orollari Lux',
       location: 'Maldivlar',
       price: 4500000,
-      duration: '5 kun / 4 tun',
+      travelingDate: '5 kun / 4 tun',
       category: 'Luxe',
       status: 'active',
       bookings: 24,
@@ -81,7 +81,7 @@ export default function PackagesManagement() {
     title: '',
     location: '',
     price: '',
-    duration: '',
+    travelingDate: '',
     category: 'Ekskursiya',
     description: '',
     highlights: '',
@@ -102,7 +102,7 @@ export default function PackagesManagement() {
   const categories = ['Ekskursiya', 'Plyaj', 'Tarix', 'Luxe', 'Avantüra', 'Oilaviy'];
 
   const handleAddPackage = () => {
-    if (!newPackage.title || !newPackage.price || !newPackage.duration) {
+    if (!newPackage.title || !newPackage.price || !newPackage.travelingDate) {
       alert('Iltimos, barcha majburiy maydonlarni to\'ldiring!');
       return;
     }
@@ -123,7 +123,7 @@ export default function PackagesManagement() {
       title: '',
       location: '',
       price: '',
-      duration: '',
+      travelingDate: '',
       category: 'Ekskursiya',
       description: '',
       highlights: '',
@@ -182,7 +182,7 @@ export default function PackagesManagement() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-gray-900 text-white transition-all duration-300 flex flex-col`}>
+      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-gray-900 text-white transition-all travelingDate-300 flex flex-col`}>
         <div className="p-6 flex items-center justify-between">
           {sidebarOpen && <span className="text-xl font-bold">Grand Tours</span>}
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-gray-800 rounded-lg">
@@ -303,7 +303,7 @@ export default function PackagesManagement() {
                     </div>
                     <div className="flex items-center text-gray-600 text-sm">
                       <Clock className="w-4 h-4 mr-2" />
-                      {pkg.duration}
+                      {pkg.travelingDate}
                     </div>
                     <div className="flex items-center text-gray-600 text-sm">
                       <DollarSign className="w-4 h-4 mr-2" />
@@ -429,8 +429,8 @@ export default function PackagesManagement() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Davomiyligi *</label>
                   <input
                     type="text"
-                    value={newPackage.duration}
-                    onChange={(e) => setNewPackage({...newPackage, duration: e.target.value})}
+                    value={newPackage.travelingDate}
+                    onChange={(e) => setNewPackage({...newPackage, travelingDate: e.target.value})}
                     placeholder="5 kun / 4 tun"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
@@ -566,8 +566,8 @@ export default function PackagesManagement() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Davomiyligi</label>
                   <input
                     type="text"
-                    value={selectedPackage.duration}
-                    onChange={(e) => setSelectedPackage({...selectedPackage, duration: e.target.value})}
+                    value={selectedPackage.travelingDate}
+                    onChange={(e) => setSelectedPackage({...selectedPackage, travelingDate: e.target.value})}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>

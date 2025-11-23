@@ -1,48 +1,120 @@
-import React, { useState } from 'react';
-import { MapPin, Mail, Lock, User, Phone, Eye, EyeOff, Facebook, Chrome } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import {
+  MapPin,
+  Mail,
+  Lock,
+  User,
+  Phone,
+  Eye,
+  EyeOff,
+  Facebook,
+  Chrome,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import axios from "axios";
+import api from "./api";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
   const navigate = useNavigate();
 
   const [loginData, setLoginData] = useState({
-    email: '',
-    password: '',
-    remember: false
+    username: "",
+    password: "",
+    remember_me: false,
   });
 
   const [registerData, setRegisterData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
-    agreeTerms: false
+    username: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+    agreeTerms: false,
   });
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    console.log('Login:', loginData);
-    navigate('/home');
-    alert('Tizimga kirildi!');
+  /*   // ------------------- INPUT CHANGE -------------------
+  const handleLoginChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setLoginData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   };
 
-  const handleRegister = (e) => {
+  const handleRegisterChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setRegisterData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  }; */
+
+  // ------------------- LOGIN -------------------
+  const handleLogin = async (e) => {
     e.preventDefault();
+
+    const res = await api({
+      endpoint: "api/login/",
+      method: "POST",
+      data: loginData,
+      withCredentials: false,
+    });
+
+    if (res.ok) {
+      // success
+      localStorage.setItem("access_token", res.data.access);
+
+      toast.success("Muvaffaqiyatli kirildi!");
+      navigate("/home");
+      return;
+    }
+
+    // ERROR STATUSES
+    if (res.status === 400) {
+      toast.error(res.data?.message || "Yaroqsiz ma'lumot!");
+      console.log(res);
+    } else if (res.status === 401) {
+      toast.error("Email yoki parol noto'g'ri!");
+    } else {
+      toast.error("Server xatosi!");
+    }
+  };
+  // ------------------- REGISTER -------------------
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
     if (registerData.password !== registerData.confirmPassword) {
-      alert('Parollar mos kelmaydi!');
+      toast.warn("Parollar mos kelmaydi!");
       return;
     }
     if (!registerData.agreeTerms) {
-      alert('Iltimos, shartlar bilan tanishing va rozilikning belgilang!');
+      toast.warn("Iltimos, shartlar bilan tanishing va rozilik belgilang!");
       return;
     }
-    console.log('Register:', registerData);
-    alert('Ro\'yxatdan o\'tdingiz! Emailingizga tasdiqlash habar yuborildi.');
+
+    const { confirmPassword, agreeTerms, ...dataToSend } = registerData;
+
+    try {
+      // Register
+      const t = await axios.post(
+        "https://neoshokh2.pythonanywhere.com/api/register/",
+        dataToSend
+      );
+      console.log(t);
+
+      toast.success("Ro'yxatdan o'tish muvaffaqiyatli!");
+
+      // Auto login
+      await handleLogin({ preventDefault: () => {} });
+    } catch (err) {
+      toast.error(
+        "Ro'yxatdan o'tishda xatolik! " + err.response?.data?.message || ""
+      );
+    }
   };
 
   return (
@@ -56,49 +128,82 @@ export default function AuthPage() {
                 <MapPin className="w-10 h-10" />
                 <span className="text-3xl font-bold">TravelHub</span>
               </div>
-              
+
               <h2 className="text-4xl font-bold mb-6">
                 Orzuingizdagi sayohatni boshlang
               </h2>
-              
+
               <p className="text-blue-100 text-lg mb-8">
-                150+ agentlik, 500+ sayohat paketi. Eng yaxshi narxlar va xizmat sifati bir joyda.
+                150+ agentlik, 500+ sayohat paketi. Eng yaxshi narxlar va xizmat
+                sifati bir joyda.
               </p>
 
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
                   <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    <svg
+                      className="w-5 h-5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
                   <div>
                     <h4 className="font-semibold mb-1">Ishonchli Xavfsizlik</h4>
-                    <p className="text-blue-100 text-sm">Barcha to'lovlar himoyalangan</p>
+                    <p className="text-blue-100 text-sm">
+                      Barcha to'lovlar himoyalangan
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-3">
                   <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    <svg
+                      className="w-5 h-5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
                   <div>
                     <h4 className="font-semibold mb-1">Eng Yaxshi Narxlar</h4>
-                    <p className="text-blue-100 text-sm">Narxlarni solishtiring va tejaing</p>
+                    <p className="text-blue-100 text-sm">
+                      Narxlarni solishtiring va tejaing
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-3">
                   <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    <svg
+                      className="w-5 h-5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-1">24/7 Qo'llab-quvvatlash</h4>
-                    <p className="text-blue-100 text-sm">Har doim yordam berishga tayyormiz</p>
+                    <h4 className="font-semibold mb-1">
+                      24/7 Qo'llab-quvvatlash
+                    </h4>
+                    <p className="text-blue-100 text-sm">
+                      Har doim yordam berishga tayyormiz
+                    </p>
                   </div>
                 </div>
               </div>
@@ -138,8 +243,8 @@ export default function AuthPage() {
                 onClick={() => setIsLogin(true)}
                 className={`flex-1 py-3 rounded-lg font-semibold transition ${
                   isLogin
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? "bg-white text-blue-600 shadow-sm"
+                    : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 Kirish
@@ -148,8 +253,8 @@ export default function AuthPage() {
                 onClick={() => setIsLogin(false)}
                 className={`flex-1 py-3 rounded-lg font-semibold transition ${
                   !isLogin
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? "bg-white text-blue-600 shadow-sm"
+                    : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 Ro'yxatdan o'tish
@@ -159,21 +264,27 @@ export default function AuthPage() {
             {isLogin ? (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Xush kelibsiz!</h2>
-                  <p className="text-gray-600">Hisobingizga kiring va sayohatni boshlang</p>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                    Xush kelibsiz!
+                  </h2>
+                  <p className="text-gray-600">
+                    Hisobingizga kiring va sayohatni boshlang
+                  </p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email manzil
+                    Ism Familiya
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                    <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
                     <input
-                      type="email"
-                      value={loginData.email}
-                      onChange={(e) => setLoginData({...loginData, email: e.target.value})}
-                      placeholder="email@example.com"
+                      type="text"
+                      value={loginData.username}
+                      onChange={(e) =>
+                        setLoginData({ ...loginData, username: e.target.value })
+                      }
+                      placeholder="Asadbek"
                       required
                       className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -187,9 +298,11 @@ export default function AuthPage() {
                   <div className="relative">
                     <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
                     <input
-                      type={showPassword ? 'text' : 'password'}
+                      type={showPassword ? "text" : "password"}
                       value={loginData.password}
-                      onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+                      onChange={(e) =>
+                        setLoginData({ ...loginData, password: e.target.value })
+                      }
                       placeholder="••••••••"
                       required
                       className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -199,7 +312,11 @@ export default function AuthPage() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600"
                     >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {showPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -209,14 +326,21 @@ export default function AuthPage() {
                     <input
                       type="checkbox"
                       checked={loginData.remember}
-                      onChange={(e) => setLoginData({...loginData, remember: e.target.checked})}
+                      onChange={(e) =>
+                        setLoginData({
+                          ...loginData,
+                          remember: e.target.checked,
+                        })
+                      }
                       className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">Meni eslab qol</span>
+                    <span className="text-sm text-gray-700">
+                      Meni eslab qol
+                    </span>
                   </label>
-                  <button type="button" className="text-sm text-blue-600 hover:text-blue-700">
+                  {/*<button type="button" className="text-sm text-blue-600 hover:text-blue-700">
                     Parolni unutdingizmi?
-                  </button>
+                  </button>*/}
                 </div>
 
                 <button
@@ -231,7 +355,9 @@ export default function AuthPage() {
                     <div className="w-full border-t border-gray-300"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-white text-gray-500">Yoki davom eting</span>
+                    <span className="px-4 bg-white text-gray-500">
+                      Yoki davom eting
+                    </span>
                   </div>
                 </div>
 
@@ -248,15 +374,21 @@ export default function AuthPage() {
                     className="flex items-center justify-center space-x-2 border-2 border-gray-300 rounded-lg py-3 hover:bg-gray-50 transition"
                   >
                     <Facebook className="w-5 h-5 text-blue-600" />
-                    <span className="font-semibold text-gray-700">Facebook</span>
+                    <span className="font-semibold text-gray-700">
+                      Facebook
+                    </span>
                   </button>
                 </div>
               </div>
             ) : (
               <div className="space-y-5">
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Hisob yarating</h2>
-                  <p className="text-gray-600">Bir daqiqada ro'yxatdan o'ting</p>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                    Hisob yarating
+                  </h2>
+                  <p className="text-gray-600">
+                    Bir daqiqada ro'yxatdan o'ting
+                  </p>
                 </div>
 
                 <div>
@@ -268,7 +400,12 @@ export default function AuthPage() {
                     <input
                       type="text"
                       value={registerData.fullName}
-                      onChange={(e) => setRegisterData({...registerData, fullName: e.target.value})}
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          username: e.target.value,
+                        })
+                      }
                       placeholder="Ism Familiyangiz"
                       required
                       className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -285,7 +422,12 @@ export default function AuthPage() {
                     <input
                       type="email"
                       value={registerData.email}
-                      onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          email: e.target.value,
+                        })
+                      }
                       placeholder="email@example.com"
                       required
                       className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -302,7 +444,12 @@ export default function AuthPage() {
                     <input
                       type="tel"
                       value={registerData.phone}
-                      onChange={(e) => setRegisterData({...registerData, phone: e.target.value})}
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          phone: e.target.value,
+                        })
+                      }
                       placeholder="+998 90 123 45 67"
                       required
                       className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -317,9 +464,14 @@ export default function AuthPage() {
                   <div className="relative">
                     <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
                     <input
-                      type={showPassword ? 'text' : 'password'}
+                      type={showPassword ? "text" : "password"}
                       value={registerData.password}
-                      onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          password: e.target.value,
+                        })
+                      }
                       placeholder="••••••••"
                       required
                       minLength={6}
@@ -330,10 +482,16 @@ export default function AuthPage() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600"
                     >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {showPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
                     </button>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">Kamida 6 ta belgi</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Kamida 6 ta belgi
+                  </p>
                 </div>
 
                 <div>
@@ -343,19 +501,30 @@ export default function AuthPage() {
                   <div className="relative">
                     <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
                     <input
-                      type={showConfirmPassword ? 'text' : 'password'}
+                      type={showConfirmPassword ? "text" : "password"}
                       value={registerData.confirmPassword}
-                      onChange={(e) => setRegisterData({...registerData, confirmPassword: e.target.value})}
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          confirmPassword: e.target.value,
+                        })
+                      }
                       placeholder="••••••••"
                       required
                       className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       className="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600"
                     >
-                      {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {showConfirmPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -364,19 +533,30 @@ export default function AuthPage() {
                   <input
                     type="checkbox"
                     checked={registerData.agreeTerms}
-                    onChange={(e) => setRegisterData({...registerData, agreeTerms: e.target.checked})}
+                    onChange={(e) =>
+                      setRegisterData({
+                        ...registerData,
+                        agreeTerms: e.target.checked,
+                      })
+                    }
                     className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 mt-1"
                   />
                   <span className="text-sm text-gray-700">
-                    Men{' '}
-                    <button type="button" className="text-blue-600 hover:underline">
+                    Men{" "}
+                    <button
+                      type="button"
+                      className="text-blue-600 hover:underline"
+                    >
                       Foydalanish shartlari
-                    </button>
-                    {' '}va{' '}
-                    <button type="button" className="text-blue-600 hover:underline">
+                    </button>{" "}
+                    va{" "}
+                    <button
+                      type="button"
+                      className="text-blue-600 hover:underline"
+                    >
                       Maxfiylik siyosati
-                    </button>
-                    {' '}bilan tanishdim va roziman
+                    </button>{" "}
+                    bilan tanishdim va roziman
                   </span>
                 </label>
 
@@ -392,7 +572,9 @@ export default function AuthPage() {
                     <div className="w-full border-t border-gray-300"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-white text-gray-500">Yoki davom eting</span>
+                    <span className="px-4 bg-white text-gray-500">
+                      Yoki davom eting
+                    </span>
                   </div>
                 </div>
 
@@ -409,7 +591,9 @@ export default function AuthPage() {
                     className="flex items-center justify-center space-x-2 border-2 border-gray-300 rounded-lg py-3 hover:bg-gray-50 transition"
                   >
                     <Facebook className="w-5 h-5 text-blue-600" />
-                    <span className="font-semibold text-gray-700">Facebook</span>
+                    <span className="font-semibold text-gray-700">
+                      Facebook
+                    </span>
                   </button>
                 </div>
               </div>
@@ -417,7 +601,9 @@ export default function AuthPage() {
 
             <div className="mt-8 text-center">
               <p className="text-sm text-gray-600">
-                {isLogin ? "Hisobingiz yo'qmi? " : "Allaqachon hisobingiz bormi? "}
+                {isLogin
+                  ? "Hisobingiz yo'qmi? "
+                  : "Allaqachon hisobingiz bormi? "}
                 <button
                   onClick={() => setIsLogin(!isLogin)}
                   className="text-blue-600 font-semibold hover:underline"

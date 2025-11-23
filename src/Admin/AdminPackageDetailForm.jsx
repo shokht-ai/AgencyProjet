@@ -12,7 +12,7 @@ export default function AdminPackageDetailForm() {
     category: 'Ekskursiya',
     price: '',
     originalPrice: '',
-    duration: '',
+    travelingDate: '',
     description: '',
     
     // Images
@@ -107,7 +107,7 @@ export default function AdminPackageDetailForm() {
 
   const handleSave = () => {
     // Validation
-    if (!packageData.title || !packageData.price || !packageData.duration) {
+    if (!packageData.title || !packageData.price || !packageData.travelingDate) {
       alert('Iltimos, barcha majburiy maydonlarni to\'ldiring!');
       return;
     }
@@ -126,7 +126,7 @@ export default function AdminPackageDetailForm() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-gray-900 text-white transition-all duration-300 flex flex-col`}>
+      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-gray-900 text-white transition-all travelingDate-300 flex flex-col`}>
         <div className="p-6 flex items-center justify-between">
           {sidebarOpen && <span className="text-xl font-bold">Grand Tours</span>}
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-gray-800 rounded-lg">
@@ -304,8 +304,8 @@ export default function AdminPackageDetailForm() {
                       </label>
                       <input
                         type="text"
-                        value={packageData.duration}
-                        onChange={(e) => setPackageData({...packageData, duration: e.target.value})}
+                        value={packageData.travelingDate}
+                        onChange={(e) => setPackageData({...packageData, travelingDate: e.target.value})}
                         placeholder="5 kun / 4 tun"
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />

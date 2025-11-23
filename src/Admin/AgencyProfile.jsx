@@ -97,7 +97,7 @@ export default function AgencyProfile() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-gray-900 text-white transition-all duration-300 flex flex-col`}>
+      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-gray-900 text-white transition-all travelingDate-300 flex flex-col`}>
         <div className="p-6 flex items-center justify-between">
           {sidebarOpen && <span className="text-xl font-bold">Grand Tours</span>}
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-gray-800 rounded-lg">
