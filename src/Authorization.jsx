@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   MapPin,
   Mail,
@@ -12,14 +12,17 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import axios from "axios";
-import api from "./api";
 
 export default function AuthPage() {
+  
+  const API_URL = process.env.REACT_APP_API_URL;
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+
+  const [autoLogin, setAutoLogin] = useState(false);
+
 
   const [loginData, setLoginData] = useState({
     username: "",
@@ -36,40 +39,30 @@ export default function AuthPage() {
     agreeTerms: false,
   });
 
-  /*   // ------------------- INPUT CHANGE -------------------
-  const handleLoginChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setLoginData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
-
-  const handleRegisterChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setRegisterData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  }; */
+  useEffect(() => {
+    if (autoLogin) {
+      handleLogin({ preventDefault: () => {} });
+      setAutoLogin(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoLogin]);
 
   // ------------------- LOGIN -------------------
   const handleLogin = async (e) => {
     e.preventDefault();
-    const BASE_URL = process.env.REACT_APP_API_URL;
-    console.log("rekshirish kerak: ",BASE_URL);
 
-
-    const res = await api({
-      endpoint: "api/login/",
+    const res = await fetch(`${API_URL}/api/login/`, {
       method: "POST",
-      data: loginData,
-      withCredentials: false,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(loginData),
     });
 
     if (res.ok) {
+      const data = await res.json(); // await kerak!
       // success
-      localStorage.setItem("access_token", res.data.access);
+      localStorage.setItem("access_token", data.access);
 
       toast.success("Muvaffaqiyatli kirildi!");
       navigate("/home");
@@ -79,13 +72,14 @@ export default function AuthPage() {
     // ERROR STATUSES
     if (res.status === 400) {
       toast.error(res.data?.message || "Yaroqsiz ma'lumot!");
-      console.log(res);
     } else if (res.status === 401) {
       toast.error("Email yoki parol noto'g'ri!");
     } else {
       toast.error("Server xatosi!");
     }
+
   };
+  
   // ------------------- REGISTER -------------------
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -99,26 +93,45 @@ export default function AuthPage() {
       return;
     }
 
-    const { confirmPassword, agreeTerms, ...dataToSend } = registerData;
+    const { confirmPassword, agreeTerms, phone, ...dataToSend } = registerData;
 
     try {
       // Register
-      const t = await axios.post(
-        "https://neoshokh2.pythonanywhere.com/api/register/",
-        dataToSend
-      );
-      console.log(t);
 
-      toast.success("Ro'yxatdan o'tish muvaffaqiyatli!");
+      const t = await fetch(`${API_URL}/api/register/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToSend),
+      });
 
-      // Auto login
-      await handleLogin({ preventDefault: () => {} });
+      if (t.ok) {
+        toast.success("Ro'yxatdan o'tish muvaffaqiyatli!");
+
+        // Auto login
+        setLoginData(
+          {
+            username: registerData.username,
+            password: registerData.password,
+            remember_me: false,
+          }
+        );
+        setAutoLogin(true);
+        return;
+      } else {
+        toast.error(
+          "Ro'yxatdan o'tishda xatolik! API " + t.response?.data?.message || ""
+        );
+        return;
+      }
     } catch (err) {
       toast.error(
         "Ro'yxatdan o'tishda xatolik! " + err.response?.data?.message || ""
       );
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
