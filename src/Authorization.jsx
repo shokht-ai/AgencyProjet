@@ -290,7 +290,7 @@ export default function AuthPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Ism Familiya
+                    Taxallus
                   </label>
                   <div className="relative">
                     <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
@@ -409,7 +409,7 @@ export default function AuthPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Ism Familiya
+                    Taxallus
                   </label>
                   <div className="relative">
                     <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
@@ -422,7 +422,7 @@ export default function AuthPage() {
                           username: e.target.value,
                         })
                       }
-                      placeholder="Ism Familiyangiz"
+                      placeholder="Taxallusingiz"
                       required
                       className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
