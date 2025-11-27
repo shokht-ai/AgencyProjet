@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import tourPackages from "./packagesdata.js";
-
+import { toast } from "react-toastify";
 
 export default function TourismLandingPage() {
   const navigate = useNavigate();
@@ -44,6 +44,14 @@ export default function TourismLandingPage() {
     navigate(`/package/${pkg.id}?date=${pkg.travelingDate}&guests=1`);
   };
 
+  const handle3DTour = () => {
+    toast.info("Bu xizmat hali ishga tushgani yo'q!");
+  };
+
+  const handleAIAssist = () => {
+    toast.info("Bu xizmat hali ishga tushgani yo'q!");
+  };
+
   // Funktsiya massivni aralashtiradi
   function shuffleArray(array) {
     return array
@@ -57,7 +65,6 @@ export default function TourismLandingPage() {
       .then((data) => setTourPackages(data))
       .catch((err) => setTourPackages([]));
   }, []);
-
 
   // Tasodifiy 3 ta paket olish
   const popularPackages = shuffleArray(
@@ -138,6 +145,21 @@ export default function TourismLandingPage() {
               >
                 Paketlar
               </Link>
+              <button
+                onClick={handle3DTour}
+                className="text-gray-700 hover:text-blue-600 transition"
+              >
+                {/* <Globe className="w-5 h-5" /> */}
+                3D Sayohat
+              </button>
+
+              <button
+                onClick={handleAIAssist}
+                className="text-gray-700 hover:text-blue-600 transition"
+              >
+                {/* <Sparkles className="w-5 h-5" /> */}
+                AI Yordamchi
+              </button>
               {/*<Link to="/" className="text-gray-700 hover:text-blue-600 transition">Agentliklar</Link>*/}
               {/* <Link to="/" className="text-gray-700 hover:text-blue-600 transition">Biz haqimizda</Link> */}
               <button onClick={handleProfileClick}>
@@ -168,6 +190,16 @@ export default function TourismLandingPage() {
               <Link to="/packages" className="block text-gray-700">
                 Paketlar
               </Link>
+              <button onClick={handle3DTour} className="block text-gray-700">
+                {/* <Globe className="w-5 h-5" /> */}
+                3D Sayohat
+              </button>
+
+              <button onClick={handleAIAssist} className="block text-gray-700">
+                {/* <Sparkles className="w-5 h-5" /> */}
+                AI Yordamchi
+              </button>
+
               {/*<Link to='/' className="block text-gray-700">Agentliklar</Link>*/}
               {/*<Link to='/' className="block text-gray-700">Biz haqimizda</Link>*/}
               <button onClick={handleProfileClick}>
