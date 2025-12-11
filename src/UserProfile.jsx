@@ -1,25 +1,66 @@
-import { useState } from 'react';
-import { User, Mail, Phone, MapPin, Calendar, Heart, ShoppingBag, Settings, Bell, Shield, CreditCard, LogOut, Edit2, Save, X, Star, Clock, CheckCircle, Lock } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Link } from "react-router-dom";
+import { User, Mail, Phone, MapPin, Calendar, Heart, ShoppingBag, Settings, Bell, Shield, CreditCard, LogOut, Edit2, Save, X, Star, Clock, CheckCircle, Hourglass, Lock } from 'lucide-react';
+import api from './api'; // Assume api is a utility for making API calls
+import { toast } from "react-toastify";
+
 
 export default function UserProfilePage() {
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
   
   const [userData, setUserData] = useState({
-    fullName: 'Kamola Rahimova',
-    email: 'kamola.rahimova@email.com',
+    fullName: 'Ism Familiya',
+    firstName: 'Ism',
+    lastName: 'Familiya',
+    email: 'example@mail.com',
     phone: '+998 90 123 45 67',
-    birthDate: '1995-05-15',
-    address: 'Toshkent, O\'zbekiston',
+    birthDate: '1900-01-01',
+    address: "Toshkent, O'zbekiston",
     avatar: 'https://ui-avatars.com/api/?name=Kamola+Rahimova&size=200&background=4F46E5&color=fff'
   });
 
   const [editData, setEditData] = useState({...userData});
 
-  const handleSave = () => {
-    setUserData(editData);
-    setIsEditing(false);
-    alert('Ma\'lumotlar saqlandi!');
+    // --- Normalizatsiya: .0 /   .1 ---
+  const normalize = (r) => {
+    const whole = Math.floor(r);
+    const dec = r - whole;
+
+    if (dec < 0.5) return whole;       // .0
+    return whole + 1;                   // keyingi butun son
+  };
+  const handleSave = async () => {
+    try {
+      const payload = {
+        user: {
+          first_name: editData.firstName,
+          last_name: editData.lastName,
+          email: editData.email,
+        },
+        phone: editData.phone,
+        birth_date: editData.birthDate,
+        address: editData.address,
+      };
+
+      const response = await api({
+        endpoint: "user/profile/",
+        method: "PATCH",
+        data: payload
+      });
+
+      if (response.ok) {
+        // Frontni yangilash
+        setUserData(editData);
+        setIsEditing(false);
+
+        toast.success("Ma'lumotlar muvaffaqiyatli saqlandi!");
+      } else {
+        toast.error(response.data.message || "Saqlashda xatolik yuz berdi!");
+      }
+    } catch (error) {
+      toast.error("Server bilan bog'lanishda xatolik!");
+    }
   };
 
   const handleCancel = () => {
@@ -27,108 +68,93 @@ export default function UserProfilePage() {
     setIsEditing(false);
   };
 
-  const bookingHistory = [
-    {
-      id: 1,
-      title: 'Dubai Premium Safari',
-      agency: 'Grand Tours',
-      date: '2024-12-15',
-      guests: 2,
-      price: 5000000,
-      status: 'upcoming',
-      image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&q=80',
-      bookingDate: '2024-10-01'
-    },
-    {
-      id: 2,
-      title: 'Istanbul Tarixiy Sayohati',
-      agency: 'Silk Road Travel',
-      date: '2024-09-20',
-      guests: 3,
-      price: 5400000,
-      status: 'completed',
-      image: 'https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=400&q=80',
-      bookingDate: '2024-08-15',
-      rating: 5
-    },
-    {
-      id: 3,
-      title: 'Bali Tropik Ta\'tili',
-      agency: 'Asia Dreams',
-      date: '2024-08-10',
-      guests: 2,
-      price: 4200000,
-      status: 'completed',
-      image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&q=80',
-      bookingDate: '2024-07-01',
-      rating: 4
-    },
-    {
-      id: 4,
-      title: 'Parij Romantik Tour',
-      agency: 'Europe Express',
-      date: '2024-06-05',
-      guests: 2,
-      price: 6400000,
-      status: 'cancelled',
-      image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&q=80',
-      bookingDate: '2024-05-10'
-    }
-  ];
+  const [bookingHistory, setBookingHistory] = useState([]);
 
-  const favoritePackages = [
-    {
-      id: 1,
-      title: 'Maldiv Orollari Lux',
-      location: 'Maldivlar',
-      price: 4500000,
-      rating: 5.0,
-      image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=400&q=80'
-    },
-    {
-      id: 2,
-      title: 'Rim Antik Sayohati',
-      location: 'Rim, Italiya',
-      price: 2800000,
-      rating: 4.8,
-      image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=400&q=80'
-    },
-    {
-      id: 3,
-      title: 'Tokio Modern Tour',
-      location: 'Tokio, Yaponiya',
-      price: 3500000,
-      rating: 4.9,
-      image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&q=80'
+  const handleDeleteBooking = async (bookingId) => {
+    if (!bookingId) {
+      toast.error("Bu tur paket topilmadi!");
+      return;
     }
-  ];
 
-  const notifications = [
-    {
-      id: 1,
-      type: 'booking',
-      title: 'Buyurtma tasdiqlandi',
-      message: 'Dubai Premium Safari sayohatingiz tasdiqlandi',
-      time: '2 soat oldin',
-      read: false
-    },
-    {
-      id: 2,
-      type: 'promo',
-      title: 'Maxsus chegirma!',
-      message: 'Istanbul turiga 20% chegirma - bugun oxirgi kun!',
-      time: '1 kun oldin',
-      read: false
-    },
-    {
-      id: 3,
-      type: 'reminder',
-      title: 'Sayohat eslatmasi',
-      message: 'Dubai sayohatingizga 30 kun qoldi',
-      time: '3 kun oldin',
-      read: true
+    try {
+      const response = await api({
+        endpoint: `user/booking/${bookingId}/`,
+        method: "PATCH",
+        data: { status: "cancelled" }
+      });
+
+      if (response.ok) {
+        toast.success("Buyurtmalar ro'yxatidan muvaffaqiyatli o'chirildi!");
+        await fetchBookings(); 
+        // Shu yerda state update yoki UI update qilishingiz mumkin
+        setActiveTab('bookings'); // favorites tabini yangilash uchun
+      } else {
+        toast.error(response.data?.message || "Buyurtmani o'chirishda xatolik yuz berdi!");
+      }
+    } catch (error) {
+      toast.error("Xatolik yuz berdi. Iltimos qayta urinib ko'ring!");
     }
-  ];
+  };
+
+  const [favoritePackages, setFavoritePackages] = useState([]);
+
+  // favorite ni o'chirish funksiyasi
+  const handleDeleteFavorite = async (favoriteId) => {
+    if (!favoriteId) {
+      toast.error("Bu tur paket topilmadi!");
+      return;
+    }
+
+    try {
+      const response = await api({
+        endpoint: `user/favorite/${favoriteId}/`,
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        toast.success("Sevimlilar ro'yxatidan muvaffaqiyatli o'chirildi!");
+        await fetchFavorites(); 
+        // Shu yerda state update yoki UI update qilishingiz mumkin
+        setActiveTab('favorites'); // favorites tabini yangilash uchun
+      } else {
+        toast.error(response.data?.message || "Favorite o'chirishda xatolik yuz berdi!");
+      }
+    } catch (error) {
+      toast.error("Xatolik yuz berdi. Iltimos qayta urinib ko‘ring!");
+    }
+  };
+
+
+  const [notifications, setNotifications] = useState([]);
+
+  const markAsRead = async () => {
+  // 🔹 1) read=false bo‘lgan ids
+  const unreadIds = notifications
+    .filter((n) => n.read === false)
+    .map((n) => n.id);
+
+  if (unreadIds.length === 0) return; // Hech narsa qilmaydi
+
+  try {
+    // 🔹 2) Backendga yuborish
+    const res = await api({
+      endpoint: "user/notification/",
+      method: "PATCH",
+      data: { ids: unreadIds },
+    });
+
+    if (res.ok) {
+      // 🔹 3) Local state'ni yangilash
+      setNotifications((prev) =>
+        prev.map((n) =>
+          unreadIds.includes(n.id) ? { ...n, read: true } : n
+        )
+      );
+    }
+  } catch (e) {
+    toast.error("Xatolik yuz berdi, qayta urinib ko'ring");
+  }
+};
 
   const getStatusBadge = (status) => {
     const styles = {
@@ -155,6 +181,136 @@ export default function UserProfilePage() {
     { id: 'notifications', label: 'Bildirishnomalar', icon: Bell },
     { id: 'settings', label: 'Sozlamalar', icon: Settings }
   ];
+  const fetchUserData = async () => {
+    // 1) USER PROFILE API
+    const profileRes = await api({
+      endpoint: "user/profile/",
+      method: "GET"
+    });
+
+    // 2) USER AVATAR API
+    const avatarRes = await api({
+      endpoint: "user/avatar/",
+      method: "GET"
+    });
+
+    if (profileRes.ok) {
+      const p = profileRes.data;
+
+      setUserData(prev => ({
+        ...prev,
+        firstName: p.user.first_name,
+        lastName: p.user.last_name,
+        fullName: `${p.user.first_name} ${p.user.last_name}`,
+        email: p.user.email,
+        phone: p.phone,
+        birthDate: p.birth_date,
+        address: p.address,
+      }));
+    }
+
+    if (avatarRes.ok) {
+      const avatarUrl = `${process.env.REACT_APP_API_URL}${avatarRes.data.avatar}`;
+      setUserData(prev => ({
+        ...prev,
+        avatar: avatarUrl
+      }));
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    setEditData(userData);
+  }, [userData]);
+
+  const fetchBookings = useCallback(async () => {
+    const res = await api({ endpoint: "user/booking/", method: "GET" });
+
+    if (res.ok) {
+      const mapped = res.data.map(item => ({
+        id: item.id,
+        title: item.tour.title,
+        tourId: item.tour.id,
+        agency: item.tour.agency,
+        date: item.tour.traveling_date,
+        guests: item.guests,
+        price: item.price,
+        status: item.status.toLowerCase(),
+        image: item.tour.images || "",
+        bookingDate: item.booking_date,
+        rating: normalize(item.rating),
+      }));
+
+      setBookingHistory(mapped);
+    } else {
+      console.log("API ERROR:", res.data);
+    }
+  }, [setBookingHistory]); // setBookingHistory ga bog'liq bo'lsa, uni qo'shish
+
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]); // fetchBookingsni dependency arrayga qo'shish
+
+
+  const fetchFavorites = async () => {
+    try {
+      const res = await api({ endpoint: "user/favorite/", method: "GET" });
+
+      if (res.ok) {
+        // API array ichidagi "tour" obyektlarini state uchun map qilish
+        const formatted = res.data.map((item) => ({
+          id: item.id,
+          packageId: item.tour.id,
+          title: item.tour.title,
+          location: item.tour.location,
+          price: item.tour.price,
+          rating: item.tour.rating,
+          image: item.tour.image,
+        }));
+
+        setFavoritePackages(formatted);
+      } else {
+        toast.error(res.data.message || "Xatolik yuz berdi");
+      }
+    } catch (err) {
+      toast.error("Server bilan bog'lanishda xatolik yuz berdi");
+    }
+  };
+
+  useEffect(() => {
+    fetchFavorites();
+  }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await api({ endpoint: "user/notification/", method: "GET" });
+
+      if (res.ok) {
+        // API response fieldlarini front-end formatiga map qilish
+        const formatted = res.data.map((item) => ({
+          id: item.id,
+          type: item.notif_type,       // booking / promo / reminder / confirmation
+          title: item.title,
+          message: item.message,
+          time: item.time_since,       // frontend da 'time' field ishlatiladi
+          read: item.read,
+        }));
+
+        setNotifications(formatted);
+      } else {
+        toast.error(res.data.message || "Xatolik yuz berdi");
+      }
+    } catch (err) {
+      toast.error("Server bilan bog'lanishda xatolik yuz berdi");
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -164,7 +320,7 @@ export default function UserProfilePage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <MapPin className="w-6 h-6 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">TravelHub</span>
+              <Link to="/home"  className="text-gray-700 hover:text-blue-600 transition"><span className="text-xl font-bold text-gray-900">TravelHub</span></Link>
             </div>
             <button className="flex items-center space-x-2 text-gray-700 hover:text-red-600 transition">
               <LogOut className="w-5 h-5" />
@@ -268,12 +424,25 @@ export default function UserProfilePage() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <User className="w-4 h-4 inline mr-2" />
-                      Ism Familiya
+                      Ism
                     </label>
                     <input
                       type="text"
-                      value={isEditing ? editData.fullName : userData.fullName}
-                      onChange={(e) => setEditData({...editData, fullName: e.target.value})}
+                      value={isEditing ? editData.firstName : userData.firstName}
+                      onChange={(e) => setEditData({...editData, firstName: e.target.value})}
+                      disabled={!isEditing}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {/* <User className="w-4 h-4 inline mr-2" /> */}
+                      Familiya
+                    </label>
+                    <input
+                      type="text"
+                      value={isEditing ? editData.lastName : userData.lastName}
+                      onChange={(e) => setEditData({...editData, lastName: e.target.value})}
                       disabled={!isEditing}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
                     />
@@ -390,6 +559,7 @@ export default function UserProfilePage() {
                         {booking.status === 'completed' && booking.rating && (
                           <div className="flex items-center space-x-2 mb-4">
                             <span className="text-sm text-gray-600">Sizning bahongiz:</span>
+                            {/* <RatingStars rating={booking.rating} /> */}
                             <div className="flex">
                               {[...Array(booking.rating)].map((_, i) => (
                                 <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
@@ -401,24 +571,24 @@ export default function UserProfilePage() {
                         <div className="flex flex-wrap gap-2">
                           {booking.status === 'upcoming' && (
                             <>
-                              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm">
+                              <Link to={`/package/${booking.tourId}?date=${booking.date}&guests=${booking.guests}`} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm">
                                 Tafsilotlar
-                              </button>
-                              <button className="border border-red-600 text-red-600 px-4 py-2 rounded-lg hover:bg-red-50 transition text-sm">
+                              </Link>
+                              <button onClick={() => handleDeleteBooking(booking.id)} className="border border-red-600 text-red-600 px-4 py-2 rounded-lg hover:bg-red-50 transition text-sm">
                                 Bekor qilish
                               </button>
                             </>
                           )}
-                          {booking.status === 'completed' && !booking.rating && (
+                          {/* {booking.status === 'completed' && !booking.rating && (
                             <button className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition text-sm">
                               Sharh qoldirish
                             </button>
-                          )}
-                          {booking.status === 'completed' && (
+                          )} */}
+                          {/* {booking.status === 'completed' && (
                             <button className="border border-blue-600 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition text-sm">
                               Qayta buyurtma qilish
                             </button>
-                          )}
+                          )} */}
                         </div>
                       </div>
                     </div>
@@ -439,7 +609,7 @@ export default function UserProfilePage() {
                           alt={pkg.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition travelingDate-500"
                         />
-                        <button className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition">
+                        <button onClick={() => handleDeleteFavorite(pkg.id)} className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition">
                           <Heart className="w-5 h-5 fill-red-500 text-red-500" />
                         </button>
                       </div>
@@ -460,9 +630,9 @@ export default function UserProfilePage() {
                             </div>
                             <div className="text-xs text-gray-500">so'm / odam</div>
                           </div>
-                          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm">
+                          <Link to={`/packages/`} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm">
                             Ko'rish
-                          </button>
+                          </Link>
                         </div>
                       </div>
                     </div>
@@ -475,7 +645,7 @@ export default function UserProfilePage() {
               <div>
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold text-gray-900">Bildirishnomalar</h2>
-                  <button className="text-blue-600 hover:text-blue-700 text-sm font-semibold">
+                  <button onClick={markAsRead} className="text-blue-600 hover:text-blue-700 text-sm font-semibold">
                     Hammasini o'qilgan deb belgilash
                   </button>
                 </div>
@@ -493,6 +663,7 @@ export default function UserProfilePage() {
                             {notif.type === 'booking' && <CheckCircle className="w-5 h-5 text-green-500" />}
                             {notif.type === 'promo' && <Star className="w-5 h-5 text-yellow-500" />}
                             {notif.type === 'reminder' && <Clock className="w-5 h-5 text-blue-500" />}
+                            {notif.type === 'confirmation' && <Hourglass className="w-5 h-5 text-blue-500" />}
                             <h3 className="font-semibold text-gray-900">{notif.title}</h3>
                           </div>
                           <p className="text-gray-600 mb-2">{notif.message}</p>

@@ -70,7 +70,7 @@ export default function CheckoutPage() {
         year: "numeric",
         month: "long",
         day: "numeric",
-      }) ?? "Muddat ko‘rsatilmagan",
+      }) ?? "Muddat ko'rsatilmagan",
 
     guests: Number(initialGuests),
 
@@ -92,7 +92,7 @@ export default function CheckoutPage() {
       toast.success(`Promo kod qo'llandi! ${packageData.discount}% chegirma oldiz.`);
     } else if (promoCode.toUpperCase() === "FIRST50") {
       setDiscount(50);
-      toast.success("Promo kod qo'llandi! 50% chegirma olasiz.");
+      toast.success("Promo kod qo'llandi! 50% chegirma oldingiz.");
     } else {
       toast.warn("Noto'g'ri promo kod!");
     }

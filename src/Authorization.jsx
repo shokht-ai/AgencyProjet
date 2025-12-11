@@ -12,10 +12,9 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import api from './api.js'
 
 export default function AuthPage() {
-  
-  const API_URL = process.env.REACT_APP_API_URL;
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -25,13 +24,15 @@ export default function AuthPage() {
 
 
   const [loginData, setLoginData] = useState({
-    username: "",
+    email: "",
     password: "",
     remember_me: false,
   });
 
   const [registerData, setRegisterData] = useState({
     username: "",
+    first_name: "",
+    last_name: "",
     email: "",
     phone: "",
     password: "",
@@ -51,16 +52,18 @@ export default function AuthPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const res = await fetch(`${API_URL}/api/login/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(loginData),
-    });
+    // const res = await fetch(`${API_URL}/api/login/`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(loginData),
+    // });
 
-    if (res.ok) {
-      const data = await res.json(); // await kerak!
+    const  res = await api({endpoint: "api/login/", method: "POST", is_auth_required: false, data: loginData, withCredentials: false});
+
+    if (res.ok) {    
+      const data = await res.data; // await kerak!
       // success
       localStorage.setItem("access_token", data.access);
 
@@ -98,13 +101,8 @@ export default function AuthPage() {
     try {
       // Register
 
-      const t = await fetch(`${API_URL}/api/register/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataToSend),
-      });
+      const t = await api({endpoint: "api/register/", method: "POST", is_auth_required: false, data: dataToSend, withCredentials: false});
+
 
       if (t.ok) {
         toast.success("Ro'yxatdan o'tish muvaffaqiyatli!");
@@ -121,14 +119,13 @@ export default function AuthPage() {
         return;
       } else {
         toast.error(
-          "Ro'yxatdan o'tishda xatolik! API " + t.response?.data?.message || ""
+          "Ro'yxatdan o'tishda xatolik! " + (t.data?.message || "Noma'lum xato")
         );
         return;
       }
     } catch (err) {
-      toast.error(
-        "Ro'yxatdan o'tishda xatolik! " + err.response?.data?.message || ""
-      );
+        const errorMessage = err.response?.data?.message || err.message || "Server xatosi!";
+        toast.error("Ro'yxatdan o'tishda xatolik! " + errorMessage);  
     }
   };
 
@@ -290,17 +287,17 @@ export default function AuthPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Taxallus
+                    Email manzil
                   </label>
                   <div className="relative">
-                    <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                    <Mail className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
                     <input
                       type="text"
-                      value={loginData.username}
+                      value={loginData.email}
                       onChange={(e) =>
-                        setLoginData({ ...loginData, username: e.target.value })
+                        setLoginData({ ...loginData, email: e.target.value })
                       }
-                      placeholder="Asadbek"
+                      placeholder="email@example.com"
                       required
                       className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -409,20 +406,42 @@ export default function AuthPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Taxallus
+                    Ism
                   </label>
                   <div className="relative">
                     <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
                     <input
                       type="text"
-                      value={registerData.fullName}
+                      value={registerData.first_name}
                       onChange={(e) =>
                         setRegisterData({
                           ...registerData,
-                          username: e.target.value,
+                          first_name: e.target.value,
                         })
                       }
-                      placeholder="Taxallusingiz"
+                      placeholder="Ismingizni kiriting"
+                      required
+                      className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Familiya
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      value={registerData.last_name}
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          last_name: e.target.value,
+                        })
+                      }
+                      placeholder="Familiyangizni kiriting"
                       required
                       className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
