@@ -199,13 +199,13 @@ export default function UserProfilePage() {
 
       setUserData(prev => ({
         ...prev,
-        firstName: p.user.first_name,
-        lastName: p.user.last_name,
-        fullName: `${p.user.first_name} ${p.user.last_name}`,
-        email: p.user.email,
-        phone: p.phone,
-        birthDate: p.birth_date,
-        address: p.address,
+        firstName: p.profile.user.first_name,
+        lastName: p.profile.user.last_name,
+        fullName: `${p.profile.user.first_name} ${p.profile.user.last_name}`,
+        email: p.profile.user.email,
+        phone: p.profile.phone,
+        birthDate: p.profile.birth_date,
+        address: p.profile.address,
       }));
     }
 

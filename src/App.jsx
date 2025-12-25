@@ -11,6 +11,7 @@ import AuthPage from "./Authorization";
 import SearchFilterPage from "./PackagSearchFiltering";
 import CheckoutPage from "./Checkout";
 import UserProfilePage from './UserProfile';
+// import Navbar from "./Navbar";
 
 export function HistoryTracker() {
   const location = useLocation();
@@ -32,10 +33,12 @@ export function HistoryTracker() {
 function App() {
   return (
     <BrowserRouter>
+    {/* <Navbar/> */}
       <ToastContainer position="top-right" autoClose={3000} />
       <HistoryTracker />
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
+
           <Route path="/" element={<AuthPage />} />
           <Route path="/packages" element={<SearchFilterPage />}></Route>
           <Route path="/home" element={<TourismLandingPage />}></Route>

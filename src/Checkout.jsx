@@ -16,6 +16,7 @@ import {
   Home,
 } from "lucide-react";
 import { toast } from "react-toastify";
+import api from "./api";
 
 import tourPackageData from "./packagesdata.json";
 
@@ -25,6 +26,7 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
+  const [isSelf, setIsSelf] = useState(false);
 
   const { id } = useParams();
   const query = new URLSearchParams(useLocation().search);
@@ -89,7 +91,9 @@ export default function CheckoutPage() {
   const applyPromoCode = () => {
     if (promoCode.toUpperCase() === "SUMMER2024") {
       setDiscount(packageData.discount);
-      toast.success(`Promo kod qo'llandi! ${packageData.discount}% chegirma oldiz.`);
+      toast.success(
+        `Promo kod qo'llandi! ${packageData.discount}% chegirma oldiz.`
+      );
     } else if (promoCode.toUpperCase() === "FIRST50") {
       setDiscount(50);
       toast.success("Promo kod qo'llandi! 50% chegirma oldingiz.");
@@ -105,6 +109,10 @@ export default function CheckoutPage() {
 
   function validateBookingInfo(bookingInfo) {
     const { fullName, email, phone } = bookingInfo;
+
+    if (isSelf) {
+      return true; // O'zim bo'lsa, tekshirish shart emas
+    }
 
     // 1. Full Name tekshirish (bo‘sh bo‘lmasligi)
     if (!fullName || fullName.trim().length === 0) {
@@ -127,8 +135,10 @@ export default function CheckoutPage() {
     return true;
   }
 
-
   function validateTravelers(travelersInfo) {
+    if (isSelf) {
+      return true; // O'zim bo'lsa, tekshirish shart emas
+    }
     const passportRules = {
       Uzbekistan: /^[A-Z]{2}[0-9]{7}$/, // EX1234567
       Kazakhstan: /^[A-Z]{2}[0-9]{6,7}$/,
@@ -153,27 +163,30 @@ export default function CheckoutPage() {
   }
 
   function validatePayment(paymentInfo) {
-  const { cardNumber, cardHolder, expiryDate, cvv } = paymentInfo;
+    if (isSelf) {
+      return true; // O'zim bo'lsa, tekshirish shart emas
+    }
+    const { cardNumber, cardHolder, expiryDate, cvv } = paymentInfo;
 
-  // 1. Card Number: faqat raqamlar, 13-19 raqam
-  const cardNumberRegex = /^\d{13,19}$/;
-  if (!cardNumber || !cardNumberRegex.test(cardNumber)) return false;
+    // 1. Card Number: faqat raqamlar, 13-19 raqam
+    const cardNumberRegex = /^\d{13,19}$/;
+    if (!cardNumber || !cardNumberRegex.test(cardNumber)) return false;
 
-  // 2. Card Holder: bo‘sh bo‘lmasligi
-  if (!cardHolder || cardHolder.trim() === "") return false;
+    // 2. Card Holder: bo‘sh bo‘lmasligi
+    if (!cardHolder || cardHolder.trim() === "") return false;
 
-  // 3. Expiry Date: YYYY-MM yoki MM/YY format
-  const expiryRegex = /^(0[1-9]|1[0-2])\/?([0-9]{2}|[0-9]{4})$/;
-  if (!expiryDate || !expiryRegex.test(expiryDate)) return false;
+    // 3. Expiry Date: YYYY-MM yoki MM/YY format
+    const expiryRegex = /^(0[1-9]|1[0-2])\/?([0-9]{2}|[0-9]{4})$/;
+    if (!expiryDate || !expiryRegex.test(expiryDate)) return false;
 
-  // 4. CVV: 3 yoki 4 raqam
-  const cvvRegex = /^[0-9]{3,4}$/;
-  if (!cvv || !cvvRegex.test(cvv)) return false;
+    // 4. CVV: 3 yoki 4 raqam
+    const cvvRegex = /^[0-9]{3,4}$/;
+    if (!cvv || !cvvRegex.test(cvv)) return false;
 
-  return true; // hammasi to‘g‘ri
-}
+    return true; // hammasi to‘g‘ri
+  }
 
-  const handleSubmitBooking = () => {
+  const handleSubmitBooking = async () => {
     if (currentStep === 1) {
       if (!validateBookingInfo(bookingInfo)) {
         toast.warn("Iltimos, majburiy maydonlarni to'ldiring!");
@@ -193,13 +206,73 @@ export default function CheckoutPage() {
           return;
         }
       }
-      toast.success(
-        "To'lov muvaffaqiyatli amalga oshirildi! Tez orada sizga tasdiqlash emaili yuboriladi."
-      );
+      // 🔥 YUBORISH UCHUN PAYLOAD TAYYORLASH
+      const payload = {
+        tour: Number(id),
+        status: 2,
+        is_self: isSelf,
+        guests: packageData.guests,
+        price: finalPrice,
+
+        // 🔹 BUYURTMACHI MA'LUMOTI
+        purchase_customer_information: isSelf
+          ? []
+          : [
+              {
+                full_name: bookingInfo.fullName,
+                email: bookingInfo.email,
+                phone: bookingInfo.phone,
+                location: bookingInfo.address,
+                special_requests: bookingInfo.specialRequests,
+              },
+            ],
+
+        // 🔹 SAYOHATCHILAR
+        purchase_travelers_information: travelersInfo.map((traveler) => ({
+          country: traveler.nationality === "Uzbekistan" ? 1 : 0, // backend ID bo‘lsa moslang
+          passport_full_name: traveler.fullName,
+          passport_number: traveler.passportNumber,
+          birth_date: traveler.birthDate,
+        })),
+
+        // 🔹 TO‘LOV
+        purchase_payment:
+          paymentMethod === "card"
+            ? [
+                {
+                  card_number: paymentInfo.cardNumber,
+                  card_owner: paymentInfo.cardHolder,
+                  card_validity_period: paymentInfo.expiryDate,
+                  card_cvv: paymentInfo.cvv,
+                },
+              ]
+            : [],
+      };
+      console.log(payload);
+
+      // 🔥 API GA YUBORISH
+      const response = await api({
+        endpoint: "purchase-travelers/",
+        method: "POST",
+        data: payload,
+        is_auth_required: true,
+      });
+
+      if (response.ok) {
+        toast.success(
+          "To'lov muvaffaqiyatli amalga oshirildi! Tez orada sizga tasdiqlash emaili yuboriladi."
+        );
+        console.log(response.data);
+
+        // navigate("/success");
+      } else {
+        toast.error(response.data?.message || "Xatolik yuz berdi!");
+        console.log(response.data);
+      }
+
       // Here would be actual payment processing
     }
   };
-
 
   const steps = [
     { number: 1, title: "Buyurtmachi ma'lumotlari", icon: User },
@@ -213,7 +286,10 @@ export default function CheckoutPage() {
       <div className="bg-white shadow-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <button onClick={() => navigate('/home')} className="flex items-center space-x-2">
+            <button
+              onClick={() => navigate("/home")}
+              className="flex items-center space-x-2"
+            >
               <MapPin className="w-6 h-6 text-blue-600" />
               <span className="text-xl font-bold text-gray-900">TravelHub</span>
             </button>
@@ -271,6 +347,28 @@ export default function CheckoutPage() {
             })}
           </div>
         </div>
+
+       {/* <div className="flex gap-3">
+
+          <button
+            onClick={() => setIsSelf(true)}
+            className={`px-4 py-2 rounded-lg border transition
+          ${isSelf ? "bg-blue-600 text-white" : "bg-white text-gray-700"}
+        `}
+          >
+            O'zim
+          </button>
+
+
+          <button
+            onClick={() => setIsSelf(false)}
+            className={`px-4 py-2 rounded-lg border transition
+          ${!isSelf ? "bg-blue-600 text-white" : "bg-white text-gray-700"}
+        `}
+          >
+            Boshqa
+          </button>
+        </div>*/}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
