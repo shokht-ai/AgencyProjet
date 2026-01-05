@@ -320,7 +320,7 @@ export default function UserProfilePage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <MapPin className="w-6 h-6 text-blue-600" />
-              <Link to="/home"  className="text-gray-700 hover:text-blue-600 transition"><span className="text-xl font-bold text-gray-900">TravelHub</span></Link>
+              <Link to="/home"  className="text-gray-700 hover:text-blue-600 transition"><span className="text-xl font-bold text-gray-900">ComeOn</span></Link>
             </div>
             <button className="flex items-center space-x-2 text-gray-700 hover:text-red-600 transition">
               <LogOut className="w-5 h-5" />

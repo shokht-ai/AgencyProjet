@@ -331,7 +331,7 @@ export default function SearchFilterPage() {
               className="flex items-center space-x-2"
             >
               <MapPin className="w-6 h-6 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">TravelHub</span>
+              <span className="text-xl font-bold text-gray-900">ComeOn</span>
             </button>
             <button
               onClick={handleBack}

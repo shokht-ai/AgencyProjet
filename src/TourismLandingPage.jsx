@@ -127,7 +127,7 @@ export default function TourismLandingPage() {
             >
               <MapPin className="w-8 h-8 text-blue-600" />
               <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                TravelHub
+                ComeOn
               </span>
             </button>
 
@@ -445,7 +445,7 @@ export default function TourismLandingPage() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <MapPin className="w-6 h-6" />
-                <span className="text-xl font-bold">TravelHub</span>
+                <span className="text-xl font-bold">ComeOn</span>
               </div>
               <p className="text-gray-400 text-sm">
                 O'zbekistonning eng yirik markazlashgan sayyohlik platformasi
@@ -495,13 +495,13 @@ export default function TourismLandingPage() {
               <h3 className="font-semibold mb-4">Aloqa</h3>
               <ul className="space-y-2 text-gray-400 text-sm">
                 <li>+998 71 123 45 67</li>
-                <li>info@travelhub.uz</li>
+                <li>info@ComeOn.uz</li>
                 <li>Toshkent, O'zbekiston</li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
-            © 2025 TravelHub. Barcha huquqlar himoyalangan.
+            © 2025 ComeOn. Barcha huquqlar himoyalangan.
           </div>
         </div>
       </footer>

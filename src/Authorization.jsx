@@ -139,7 +139,7 @@ export default function AuthPage() {
             <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl p-12 text-white">
               <div className="flex items-center space-x-2 mb-8">
                 <MapPin className="w-10 h-10" />
-                <span className="text-3xl font-bold">TravelHub</span>
+                <span className="text-3xl font-bold">ComeOn</span>
               </div>
 
               <h2 className="text-4xl font-bold mb-6">
@@ -246,7 +246,7 @@ export default function AuthPage() {
             <div className="lg:hidden flex items-center justify-center space-x-2 mb-8">
               <MapPin className="w-8 h-8 text-blue-600" />
               <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                TravelHub
+                ComeOn
               </span>
             </div>
 

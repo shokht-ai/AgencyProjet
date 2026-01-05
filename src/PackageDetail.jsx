@@ -202,7 +202,7 @@ export default function PackageDetailPage() {
               >
                 <MapPin className="w-6 h-6 text-blue-600" />
                 <span className="text-xl font-bold text-gray-900">
-                  TravelHub
+                  ComeOn
                 </span>
               </button>
             </div>
