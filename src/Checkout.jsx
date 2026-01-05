@@ -26,8 +26,8 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
-  const [isSelf, setIsSelf] = useState(false);
-
+  // const [isSelf, setIsSelf] = useState(false);
+  const isSelf = false;
   const { id } = useParams();
   const query = new URLSearchParams(useLocation().search);
 
